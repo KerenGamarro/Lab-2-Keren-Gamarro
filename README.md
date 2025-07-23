@@ -6,13 +6,13 @@ Los otros dos botones aumentan o disminuyen el contador, independiente del modo 
 Se utilizan los pines GPIO como entrada y salida
 
 # Materiales:
--1 protoboard
--1 controlador ESP32
--3 push buttons
--4 LEDs
--Jumpers
--4 Resistencias de 220 Ohms a 1 kOhms
--1 Resistencia de 10 kOhms
+- 1 protoboard
+- 1 controlador ESP32
+- 3 push buttons
+- 4 LEDs
+- Jumpers
+- 4 Resistencias de 220 Ohms a 1 kOhms
+- 1 Resistencia de 10 kOhms
 
 # Requerimientos que pedia la guia:
 - Todos los botones deben implementarse con anti-rebote y no deben bloquearse
