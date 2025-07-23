@@ -1,5 +1,5 @@
 // Keren Gamarro - Contador con dos modos (unidades y décadas) y cambio con botón
-//ya funcionan todos los botones, el led a sigue titilando al apachar el boton pero puede ser por el protoboard
+//ya funcionan todos los botones, el led A sigue titilando al apachar el boton pero puede ser por el protoboard
 #include <Arduino.h>
 
 // Pines de LEDs
