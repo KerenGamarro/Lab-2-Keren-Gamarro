@@ -1,0 +1,94 @@
+// Keren Gamarro - Lab 2 - Parte A
+// Contador de décadas (0-9) con 4 LEDs y 2 botones con antirrebote
+// Usando ESP32
+#include <Arduino.h>
+// Pines de LEDs
+const int leda = 2;  //inicio
+const int ledb = 4;
+const int ledc = 18;
+const int ledd = 19;  // final
+
+// Pines de botones
+const int botonSubir = 5;     // Pull-up interno,no resistencia fisica
+const int botonBajar = 21;     // igual
+
+// Variables de control
+int contador = 0;
+bool estadoAnteriorSubir = HIGH;
+bool estadoAnteriorBajar = LOW;
+unsigned long tiempoAnteriorSubir = 0;
+unsigned long tiempoAnteriorBajar = 0;
+int tiempoRebote = 50;
+
+// Prototipo de función
+void mostrarContador();
+
+void setup() {
+  pinMode(leda, OUTPUT);
+  pinMode(ledb, OUTPUT);
+  pinMode(ledc, OUTPUT);
+  pinMode(ledd, OUTPUT);
+
+  pinMode(botonSubir, INPUT_PULLUP);   // Botón con pull-up interno
+  pinMode(botonBajar, INPUT_PULLUP);          // igual
+
+  Serial.begin(9600);
+
+  mostrarContador();  // Mostrar valor inicial
+}
+
+void loop() {
+  // Leer estados actuales
+  bool lecturaSubir = digitalRead(botonSubir);
+  bool lecturaBajar = digitalRead(botonBajar);
+  unsigned long tiempoActual = millis();
+
+  // Para el boton subir
+  if (lecturaSubir != estadoAnteriorSubir) {
+    tiempoAnteriorSubir = tiempoActual;
+    estadoAnteriorSubir = lecturaSubir;
+  }
+
+  if ((tiempoActual - tiempoAnteriorSubir) > tiempoRebote && lecturaSubir == LOW) {
+    contador++;
+    if (contador > 9) {
+      contador = 0;
+    }
+    mostrarContador();
+    while (digitalRead(botonSubir) == LOW);  // Esperar a que se suelte
+  }
+
+  // para el boton bajar
+  if (lecturaBajar != estadoAnteriorBajar) {
+    tiempoAnteriorBajar = tiempoActual;
+    estadoAnteriorBajar = lecturaBajar;
+  }
+
+  if ((tiempoActual - tiempoAnteriorBajar) > tiempoRebote && lecturaBajar == HIGH) {
+    contador--;
+    if (contador < 0) {
+      contador = 9;
+    }
+    mostrarContador();
+    while (digitalRead(botonBajar) == HIGH);  // Esperar a que se suelte
+  }
+}
+
+void mostrarContador() {
+  switch (contador) {
+    case 0: digitalWrite(leda, LOW); digitalWrite(ledb, LOW); digitalWrite(ledc, LOW); digitalWrite(ledd, LOW); break;
+    case 1: digitalWrite(leda, HIGH); digitalWrite(ledb, LOW); digitalWrite(ledc, LOW); digitalWrite(ledd, LOW); break;
+    case 2: digitalWrite(leda, LOW); digitalWrite(ledb, HIGH); digitalWrite(ledc, LOW); digitalWrite(ledd, LOW); break;
+    case 3: digitalWrite(leda, HIGH); digitalWrite(ledb, HIGH); digitalWrite(ledc, LOW); digitalWrite(ledd, LOW); break;
+    case 4: digitalWrite(leda, LOW); digitalWrite(ledb, LOW); digitalWrite(ledc, HIGH); digitalWrite(ledd, LOW); break;
+    case 5: digitalWrite(leda, HIGH); digitalWrite(ledb, LOW); digitalWrite(ledc, HIGH); digitalWrite(ledd, LOW); break;
+    case 6: digitalWrite(leda, LOW); digitalWrite(ledb, HIGH); digitalWrite(ledc, HIGH); digitalWrite(ledd, LOW); break;
+    case 7: digitalWrite(leda, HIGH); digitalWrite(ledb, HIGH); digitalWrite(ledc, HIGH); digitalWrite(ledd, LOW); break;
+    case 8: digitalWrite(leda, LOW); digitalWrite(ledb, LOW); digitalWrite(ledc, LOW); digitalWrite(ledd, HIGH); break;
+    case 9: digitalWrite(leda, HIGH); digitalWrite(ledb, LOW); digitalWrite(ledc, LOW); digitalWrite(ledd, HIGH); break;
+  }
+
+  Serial.print("Contador: ");
+  Serial.println(contador);
+}
+
