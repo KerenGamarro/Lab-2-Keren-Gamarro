@@ -1,0 +1,119 @@
+// Keren Gamarro - Contador con dos modos (unidades y décadas) y cambio con botón
+//ya funcionan todos los botones, el led a sigue titilando al apachar el boton pero puede ser por el protoboard
+#include <Arduino.h>
+
+// Pines de LEDs
+const int leda = 2;
+const int ledb = 4;
+const int ledc = 18;
+const int ledd = 19;
+
+// Pines de botones
+const int botonSubir = 33;  // A GND, usará INPUT_PULLUP
+const int botonBajar = 22;  // A 3.3V, usará INPUT_PULLDOWN
+const int botonModo = 23;   // Resistencia física, usará INPUT
+
+// Variables
+int contador = 0;
+int modo = 0; // 0 = unidades, 1 = décadas
+
+unsigned long tiempoRebote = 150;
+unsigned long tiempoUltimoSubir = 0;
+unsigned long tiempoUltimoBajar = 0;
+unsigned long tiempoUltimoModo = 0;
+
+bool estadoAnteriorSubir = HIGH;
+bool estadoAnteriorBajar = LOW;
+bool estadoAnteriorModo = HIGH;
+
+// Prototipo
+void mostrarContador();
+
+void setup() {
+  pinMode(leda, OUTPUT);
+  pinMode(ledb, OUTPUT);
+  pinMode(ledc, OUTPUT);
+  pinMode(ledd, OUTPUT);
+
+  pinMode(botonSubir, INPUT_PULLUP);     // Conectado a GND
+  pinMode(botonBajar, INPUT_PULLDOWN);   // Conectado a 3.3V
+  pinMode(botonModo, INPUT);             // Resistencia física
+
+  Serial.begin(9600);
+  mostrarContador();
+}
+
+void loop() {
+  unsigned long ahora = millis();
+
+  // --- Botón Subir ---
+  bool estadoSubir = digitalRead(botonSubir);
+  if (estadoAnteriorSubir == HIGH && estadoSubir == LOW && (ahora - tiempoUltimoSubir > tiempoRebote)) {
+    if (modo == 0) {
+      contador = (contador + 1) % 10;
+    } else {
+      contador += 10;
+      if (contador > 90) contador = 0;
+    }
+    mostrarContador();
+    tiempoUltimoSubir = ahora;
+  }
+  estadoAnteriorSubir = estadoSubir;
+
+  // --- Botón Bajar ---
+  bool estadoBajar = digitalRead(botonBajar);
+  if (estadoAnteriorBajar == LOW && estadoBajar == HIGH && (ahora - tiempoUltimoBajar > tiempoRebote)) {
+    if (modo == 0) {
+      contador = (contador - 1 + 10) % 10;
+    } else {
+      contador -= 10;
+      if (contador < 0) contador = 90;
+    }
+    mostrarContador();
+    tiempoUltimoBajar = ahora;
+  }
+  estadoAnteriorBajar = estadoBajar;
+
+  // --- Botón Modo ---
+  bool estadoModo = digitalRead(botonModo);
+  if (estadoAnteriorModo == HIGH && estadoModo == LOW && (ahora - tiempoUltimoModo > tiempoRebote)) {
+    modo = !modo;
+    contador = 0;
+    mostrarContador();
+    Serial.println(modo == 0 ? "Modo: Unidades" : "Modo: Décadas");
+    tiempoUltimoModo = ahora;
+  }
+  estadoAnteriorModo = estadoModo;
+}
+
+void mostrarContador() {
+  digitalWrite(leda, LOW);
+  digitalWrite(ledb, LOW);
+  digitalWrite(ledc, LOW);
+  digitalWrite(ledd, LOW);
+
+  if (modo == 0) {
+    switch (contador) {
+      case 0: break;
+      case 1: digitalWrite(leda, HIGH); break;
+      case 2: digitalWrite(ledb, HIGH); break;
+      case 3: digitalWrite(leda, HIGH); digitalWrite(ledb, HIGH); break;
+      case 4: digitalWrite(ledc, HIGH); break;
+      case 5: digitalWrite(leda, HIGH); digitalWrite(ledc, HIGH); break;
+      case 6: digitalWrite(ledb, HIGH); digitalWrite(ledc, HIGH); break;
+      case 7: digitalWrite(leda, HIGH); digitalWrite(ledb, HIGH); digitalWrite(ledc, HIGH); break;
+      case 8: digitalWrite(ledd, HIGH); break;
+      case 9: digitalWrite(leda, HIGH); digitalWrite(ledd, HIGH); break;
+    }
+  } else {
+    switch ((contador / 10) % 4) {
+      case 0: digitalWrite(leda, HIGH); break;
+      case 1: digitalWrite(ledb, HIGH); break;
+      case 2: digitalWrite(ledc, HIGH); break;
+      case 3: digitalWrite(ledd, HIGH); break;
+    }
+  }
+
+  Serial.print("Contador: ");
+  Serial.println(contador);
+}
