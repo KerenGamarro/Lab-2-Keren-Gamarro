@@ -1,6 +1,7 @@
 // Keren Gamarro - Lab 2 - Parte A
 // Contador de décadas (0-9) con 4 LEDs y 2 botones con antirrebote
 // Usando ESP32
+//no habia leido y lo hice con decadas, pero puedo usar parte de esto para hacer lo demas
 #include <Arduino.h>
 // Pines de LEDs
 const int leda = 2;  //inicio
