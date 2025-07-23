@@ -12,7 +12,7 @@ const int ledd = 19;  // Década 30
 
 // Botones
 const int botonSubir = 33; //con los otros no me agarro, pero este si
-const int botonBajar = 21;
+const int botonBajar = 22;
 
 // Variables
 int contador = 0;  // Valores: 0, 10, ..., 90
