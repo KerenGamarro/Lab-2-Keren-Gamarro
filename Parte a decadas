@@ -1,0 +1,89 @@
+// Keren Gamarro - Lab 2 - Parte A (Décadas circulares)
+// Contador de décadas circular con 4 LEDs y 2 botones con antirrebote
+// ESP32
+
+#include <Arduino.h>
+
+// Pines de LEDs
+const int leda = 2;   // Década 0
+const int ledb = 4;   // Década 10
+const int ledc = 18;  // Década 20
+const int ledd = 19;  // Década 30
+
+// Botones
+const int botonSubir = 33; //con los otros no me agarro, pero este si
+const int botonBajar = 21;
+
+// Variables
+int contador = 0;  // Valores: 0, 10, ..., 90
+bool estadoAnteriorSubir = HIGH;
+bool estadoAnteriorBajar = HIGH;
+unsigned long tiempoAnteriorSubir = 0;
+unsigned long tiempoAnteriorBajar = 0;
+int tiempoRebote = 150;
+
+void mostrarContador();
+
+void setup() {
+  pinMode(leda, OUTPUT); //conecte resistencia fisica
+  pinMode(ledb, OUTPUT);
+  pinMode(ledc, OUTPUT);
+  pinMode(ledd, OUTPUT);
+
+  pinMode(botonSubir, INPUT_PULLUP); //llevan resistencia interna, no conecto resistencia fisica
+  pinMode(botonBajar, INPUT_PULLUP);
+
+  Serial.begin(9600); //lo del monitor funciona con arduino pero hay que poner algo extra si se usa visual studio code
+  mostrarContador();
+}
+
+void loop() {
+  bool lecturaSubir = digitalRead(botonSubir);
+  bool lecturaBajar = digitalRead(botonBajar);
+  unsigned long tiempoActual = millis();
+
+  // Subir
+  if (lecturaSubir != estadoAnteriorSubir) {
+    tiempoAnteriorSubir = tiempoActual;
+    estadoAnteriorSubir = lecturaSubir;
+  }
+
+  if ((tiempoActual - tiempoAnteriorSubir) > tiempoRebote && lecturaSubir == LOW) {
+    contador += 10;
+    if (contador > 90) contador = 0;
+    mostrarContador();
+    while (digitalRead(botonSubir) == LOW);  // Esperar suelte
+  }
+
+  // Bajar
+  if (lecturaBajar != estadoAnteriorBajar) {
+    tiempoAnteriorBajar = tiempoActual;
+    estadoAnteriorBajar = lecturaBajar;
+  }
+
+  if ((tiempoActual - tiempoAnteriorBajar) > tiempoRebote && lecturaBajar == LOW) {
+    contador -= 10;
+    if (contador < 0) contador = 90;
+    mostrarContador();
+    while (digitalRead(botonBajar) == LOW);  // Esperar suelte
+  }
+}
+
+void mostrarContador() {
+  // Apagar todos
+  digitalWrite(leda, LOW);
+  digitalWrite(ledb, LOW);
+  digitalWrite(ledc, LOW);
+  digitalWrite(ledd, LOW);
+
+  // Elegir LED según década (circular cada 4 valores) solo hay 4 decadas
+  switch ((contador / 10) % 4) {
+    case 0: digitalWrite(leda, HIGH); break;
+    case 1: digitalWrite(ledb, HIGH); break;
+    case 2: digitalWrite(ledc, HIGH); break;
+    case 3: digitalWrite(ledd, HIGH); break;
+  }
+
+  Serial.print("Contador: ");
+  Serial.println(contador);
+}
