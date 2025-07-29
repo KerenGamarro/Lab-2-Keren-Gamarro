@@ -3,21 +3,21 @@
 #include <Arduino.h>
 
 // Pines de LEDs
-const int leda = 2;
+const int leda = 15; //Botones en orden
 const int ledb = 4;
 const int ledc = 18;
 const int ledd = 19;
 
 // Pines de botones
-const int botonSubir = 33;  // A GND, usará INPUT_PULLUP
-const int botonBajar = 22;  // A 3.3V, usará INPUT_PULLDOWN
-const int botonModo = 23;   // Resistencia física, usará INPUT
+const int botonSubir = 33;  // A GND, va a ser INPUT_PULLUP
+const int botonBajar = 22;  // A 3.3V, va a ser INPUT_PULLDOWN
+const int botonModo = 23;   // Resistencia física para usar INPUT
 
 // Variables
 int contador = 0;
 int modo = 0; // 0 = unidades, 1 = décadas
 
-unsigned long tiempoRebote = 150;
+unsigned long tiempoRebote = 150; //para que no rebote, con 100 todavia falla un poco
 unsigned long tiempoUltimoSubir = 0;
 unsigned long tiempoUltimoBajar = 0;
 unsigned long tiempoUltimoModo = 0;
@@ -87,7 +87,7 @@ void loop() {
 }
 
 void mostrarContador() {
-  digitalWrite(leda, LOW);
+  digitalWrite(leda, LOW); //todos los leds empiezan apagados para no generar confusión
   digitalWrite(ledb, LOW);
   digitalWrite(ledc, LOW);
   digitalWrite(ledd, LOW);
